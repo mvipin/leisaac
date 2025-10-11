@@ -1,6 +1,7 @@
 import os
 import h5py
 import numpy as np
+import argparse
 
 from tqdm import tqdm
 
@@ -255,14 +256,25 @@ def process_bi_arm_data(dataset: LeRobotDataset, task: str, demo_group: h5py.Gro
     return True
 
 
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description="Convert IsaacLab HDF5 dataset to LeRobot format")
+    parser.add_argument('--repo_id', type=str, default='EverNorif/so101_test_orange_pick',
+                        help='Repository ID for the dataset')
+    parser.add_argument('--task', type=str, default='Grab orange and place into plate',
+                        help='Task description/language prompt')
+    return parser.parse_args()
+
+
 def convert_isaaclab_to_lerobot():
     """NOTE: Modify the following parameters to fit your own dataset"""
-    repo_id = 'EverNorif/so101_test_orange_pick'
+    args = parse_args()
+    repo_id = args.repo_id
     robot_type = 'so101_follower'  # so101_follower, bi_so101_follower
     fps = 30
     hdf5_root = './datasets'
     hdf5_files = [os.path.join(hdf5_root, 'dataset.hdf5')]
-    task = 'Grab orange and place into plate'
+    task = args.task
     push_to_hub = False
 
     """parameters check"""
