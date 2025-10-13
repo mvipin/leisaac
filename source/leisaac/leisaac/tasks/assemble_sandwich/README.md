@@ -289,6 +289,11 @@ Add MimicGen subtask termination signals to enable proper segmentation during da
 - `grasp_ingredient`: Triggered when ingredient is successfully grasped
 - `place_ingredient`: Triggered when ingredient is placed on plate (final subtask)
 
+**Automatic Detection:** The `grasp_ingredient` signal is automatically detected using:
+- **Distance threshold**: Ingredient within 0.05m of end-effector
+- **Gripper closure**: Gripper joint position below 0.60 threshold
+- **Multi-ingredient support**: Works with bread_slice_1, bread_slice_2, patty, or cheese_slice
+
 **Purpose:** Subtask annotations enable MimicGen to understand task structure and generate variations that respect the logical sequence of actions.
 
 ### Step 5: Generate Augmented Demonstrations

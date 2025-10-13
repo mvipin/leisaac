@@ -1,18 +1,51 @@
 from isaaclab.envs.mimic_env_cfg import MimicEnvCfg, SubTaskConfig
+from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import ObservationGroupCfg as ObsGroup
+from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 from .assemble_sandwich_env_cfg import AssembleSandwichEnvCfg
+from ..template import SingleArmObservationsCfg
+from . import mdp
+
+
+@configclass
+class SandwichIngredientObservationsCfg(SingleArmObservationsCfg):
+    """Observation specifications for the sandwich ingredient manipulation task."""
+
+    @configclass
+    class SubtaskCfg(ObsGroup):
+        """Observations for subtask group."""
+
+        grasp_ingredient = ObsTerm(
+            func=mdp.ingredient_grasped,
+            params={
+                "robot_cfg": SceneEntityCfg("robot"),
+                "ee_frame_cfg": SceneEntityCfg("ee_frame"),
+                "diff_threshold": 0.05,
+                "grasp_threshold": 0.60,
+            },
+        )
+
+        def __post_init__(self):
+            self.enable_corruption = False
+            self.concatenate_terms = False
+
+    # observation groups
+    subtask_terms: SubtaskCfg = SubtaskCfg()
 
 
 @configclass
 class SandwichIngredientMimicEnvCfg(AssembleSandwichEnvCfg, MimicEnvCfg):
     """
     Generalized configuration for sandwich ingredient manipulation with mimic environment.
-    
     This environment supports language prompt-based differentiation between ingredient types
     (bread, patty, cheese) using the same physical manipulation skills. The specific ingredient
     type is determined by language prompts during training and inference.
     """
+
+    # Override observations to include subtask terms for automatic annotation
+    observations: SandwichIngredientObservationsCfg = SandwichIngredientObservationsCfg()
 
     def __post_init__(self):
         super().__post_init__()
