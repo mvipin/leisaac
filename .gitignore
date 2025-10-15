@@ -71,7 +71,12 @@ source/leisaac/leisaac/devices/lerobot/.cache/right_so101_leader.json
 
 # scene assets
 assets/scenes/*
+!assets/scenes/
+!assets/scenes/**/
+!assets/scenes/**/*.usd
+!assets/scenes/**/*.usda
 !assets/scenes/.gitkeep
+
 assets/robots/*
 !assets/robots/.gitkeep
 
