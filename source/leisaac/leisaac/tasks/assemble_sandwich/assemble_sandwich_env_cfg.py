@@ -68,7 +68,9 @@ class AssembleSandwichEnvCfg(SingleArmTaskEnvCfg):
         self.scene.wrist.spawn.clipping_range = (0.005, 20.0)
 
         # Front camera: Complete table workspace overview
-        self.scene.front.offset.pos = (-0.2, -0.8, 0.7)
+        # Centered between plate (X=2.9) and ingredients holder (X=2.4)
+        # Camera world position: (2.65, -2.8, 1.51) for balanced workspace view
+        self.scene.front.offset.pos = (-0.05, -0.8, 0.7)
         self.scene.front.offset.rot = (0.2, -0.98, 0.0, 0.0)
         self.scene.front.spawn.focal_length = 24.0
         self.scene.front.spawn.horizontal_aperture = 45.0  # ~85° FOV
