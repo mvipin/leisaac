@@ -1,10 +1,13 @@
 from isaaclab.assets import AssetBaseCfg
 from isaaclab.utils import configclass
+from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import SceneEntityCfg
 
 from leisaac.assets.scenes.kitchen import KITCHEN_WITH_SANDWICH_CFG, KITCHEN_WITH_SANDWICH_USD_PATH
 from leisaac.utils.general_assets import parse_usd_and_create_subassets
 
 from ..template import SingleArmTaskSceneCfg, SingleArmTaskEnvCfg, SingleArmTerminationsCfg, SingleArmObservationsCfg
+from . import mdp
 
 
 @configclass
@@ -15,6 +18,24 @@ class AssembleSandwichSceneCfg(SingleArmTaskSceneCfg):
 
 
 @configclass
+class TerminationsCfg(SingleArmTerminationsCfg):
+    """Termination configuration for the assemble sandwich task."""
+
+    success = DoneTerm(
+        func=mdp.task_done,
+        params={
+            "plate_cfg": SceneEntityCfg("plate"),
+            "bread_slice_1_cfg": SceneEntityCfg("bread_slice_1"),
+            "cheese_slice_cfg": SceneEntityCfg("cheese_slice"),
+            "patty_cfg": SceneEntityCfg("patty"),
+            "bread_slice_2_cfg": SceneEntityCfg("bread_slice_2"),
+            "height_threshold": 0.02,
+            "xy_threshold": 0.05,
+        },
+    )
+
+
+@configclass
 class AssembleSandwichEnvCfg(SingleArmTaskEnvCfg):
     """Configuration for the assemble sandwich environment."""
 
@@ -22,7 +43,7 @@ class AssembleSandwichEnvCfg(SingleArmTaskEnvCfg):
 
     observations: SingleArmObservationsCfg = SingleArmObservationsCfg()
 
-    terminations: SingleArmTerminationsCfg = SingleArmTerminationsCfg()
+    terminations: TerminationsCfg = TerminationsCfg()
 
     def __post_init__(self) -> None:
         super().__post_init__()
