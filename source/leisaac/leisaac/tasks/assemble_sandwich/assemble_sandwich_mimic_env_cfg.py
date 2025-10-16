@@ -67,11 +67,13 @@ class AssembleSandwichMimicEnvCfg(AssembleSandwichEnvCfg, MimicEnvCfg):
         subtask_configs = []
         
         # Subtask 1: Grasp ingredient from cartridge
-        # Note: The specific ingredient (bread/patty/cheese) is determined by language prompts
-        # during training data generation and inference
+        # Note: The specific ingredient object name must match the USD scene object
+        # For bread demos: use "bread_slice_1" or "bread_slice_2"
+        # For patty demos: use "patty"
+        # For cheese demos: use "cheese_slice"
         subtask_configs.append(
             SubTaskConfig(
-                object_ref="ingredient",  # Generic reference - maps to specific ingredient via USD
+                object_ref="bread_slice_1",  # IMPORTANT: Change this to match the object in your demo
                 subtask_term_signal="grasp_ingredient",  # Generic termination signal
                 subtask_term_offset_range=(10, 20),
                 selection_strategy="nearest_neighbor_object",
@@ -80,8 +82,8 @@ class AssembleSandwichMimicEnvCfg(AssembleSandwichEnvCfg, MimicEnvCfg):
                 num_interpolation_steps=8,  # More steps for smoother motion
                 num_fixed_steps=0,
                 apply_noise_during_interpolation=False,
-                description="Grasp ingredient from cartridge",  # Generic description
-                next_subtask_description="Place ingredient on plate",
+                description="Grasp bread slice from cartridge",
+                next_subtask_description="Place bread slice on plate",
             )
         )
         
@@ -97,7 +99,7 @@ class AssembleSandwichMimicEnvCfg(AssembleSandwichEnvCfg, MimicEnvCfg):
                 num_interpolation_steps=8,
                 num_fixed_steps=0,
                 apply_noise_during_interpolation=False,
-                description="Place ingredient on plate",  # Generic description
+                description="Place bread slice on plate",
             )
         )
         

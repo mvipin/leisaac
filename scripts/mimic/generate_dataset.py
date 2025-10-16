@@ -30,6 +30,13 @@ parser.add_argument(
 )
 parser.add_argument("--task_type", type=str, default=None, help="Specify task type. If your annotated dataset is recorded with keyboard, you should set it to 'keyboard', otherwise not to set it and keep default value None.")
 parser.add_argument(
+    "--ingredient_type",
+    type=str,
+    default=None,
+    choices=["bread_slice_1", "bread_slice_2", "cheese_slice", "patty"],
+    help="Specify the ingredient type for sandwich assembly task. This dynamically sets the object_ref in subtask configs. Options: bread_slice_1, bread_slice_2, cheese_slice, patty. If not specified, uses the default from the environment config.",
+)
+parser.add_argument(
     "--pause_subtask",
     action="store_true",
     help="pause after every subtask during generation for debugging - only useful with render flag",
@@ -101,6 +108,36 @@ def main():
         generation_num_trials=args_cli.generation_num_trials,
     )
     setattr(env_cfg, 'task_type', get_task_type(task_name, args_cli.task_type))
+
+    # Dynamically set ingredient type for sandwich assembly task
+    if args_cli.ingredient_type is not None and "AssembleSandwich" in env_name:
+        # Mapping from ingredient type to human-readable names
+        ingredient_display_names = {
+            "bread_slice_1": "bread slice",
+            "bread_slice_2": "bread slice",
+            "cheese_slice": "cheese slice",
+            "patty": "patty",
+        }
+
+        ingredient_name = ingredient_display_names.get(args_cli.ingredient_type, args_cli.ingredient_type)
+
+        # Modify the first subtask config to use the specified ingredient
+        if hasattr(env_cfg, 'subtask_configs') and len(env_cfg.subtask_configs) > 0:
+            # Update object_ref for the first subtask (grasp ingredient)
+            env_cfg.subtask_configs["so101_follower"][0].object_ref = args_cli.ingredient_type
+            # Update descriptions
+            env_cfg.subtask_configs["so101_follower"][0].description = f"Grasp {ingredient_name} from cartridge"
+            env_cfg.subtask_configs["so101_follower"][0].next_subtask_description = f"Place {ingredient_name} on plate"
+            # Update second subtask description (place on plate)
+            if len(env_cfg.subtask_configs["so101_follower"]) > 1:
+                env_cfg.subtask_configs["so101_follower"][1].description = f"Place {ingredient_name} on plate"
+
+            print(f"[INFO] Ingredient type set to: {args_cli.ingredient_type} ({ingredient_name})")
+        else:
+            omni.log.warn(
+                f"Could not find subtask_configs in environment config. "
+                f"The --ingredient_type argument will be ignored."
+            )
 
     # create environment
     env = gym.make(env_name, cfg=env_cfg).unwrapped

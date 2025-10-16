@@ -331,6 +331,7 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
     --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/annotated_bread_ingredient.hdf5 \
     --output_file=./datasets/generated_bread_ingredient.hdf5 \
+    --ingredient_type=bread_slice_1 \
     --generation_num_trials=20 \
     --num_envs=1 \
     --device=cuda \
@@ -341,6 +342,7 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
     --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/annotated_patty_ingredient.hdf5 \
     --output_file=./datasets/generated_patty_ingredient.hdf5 \
+    --ingredient_type=patty \
     --generation_num_trials=20 \
     --num_envs=1 \
     --device=cuda \
@@ -351,6 +353,7 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
     --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/annotated_cheese_ingredient.hdf5 \
     --output_file=./datasets/generated_cheese_ingredient.hdf5 \
+    --ingredient_type=cheese_slice \
     --generation_num_trials=20 \
     --num_envs=1 \
     --device=cuda \
@@ -358,10 +361,16 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
 ```
 
 **Parameters Explained:**
+- `--ingredient_type`: **NEW!** Dynamically sets which ingredient object to track during generation
+  - Options: `bread_slice_1`, `bread_slice_2`, `cheese_slice`, `patty`
+  - Must match the ingredient used in your demonstrations
+  - Automatically updates subtask object references and descriptions
 - `--generation_num_trials=20`: Number of synthetic demonstrations to generate per source demo
 - `--num_envs=1`: Number of parallel environments for generation
 
 **Expected Output:** Each input demonstration generates ~20 synthetic variations, significantly expanding your dataset size.
+
+**Important Note:** The `--ingredient_type` parameter is **required** for the sandwich assembly task to ensure MimicGen tracks the correct object during data generation. Make sure it matches the ingredient you demonstrated in your source dataset.
 
 ### Step 6: Convert IK Actions Back to Joint Space
 
