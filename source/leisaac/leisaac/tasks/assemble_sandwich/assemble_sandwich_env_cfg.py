@@ -49,12 +49,15 @@ class AssembleSandwichEnvCfg(SingleArmTaskEnvCfg):
     def __post_init__(self) -> None:
         super().__post_init__()
 
-        # Optimized viewer camera for simplified table workspace
-        self.viewer.eye = (1.5, -1.5, 1.8)     # Elevated diagonal view
-        self.viewer.lookat = (0.0, 0.0, 0.9)   # Looking at table center
-
         # Robot position for simplified table workspace
         self.scene.robot.init_state.pos = (2.7, -2, 0.81)  # Closer to desk/table
+
+        # Optimized viewer camera for teleoperation - front-diagonal view of table workspace
+        # Positioned to give clear view of table surface, ingredients, and robot arm movements
+        # Camera positions are in ABSOLUTE world coordinates (not relative to env origin)
+        # Table/workspace is located around (2.7, -1.5, 0.9) in world coordinates
+        self.viewer.eye = (3.2, -3.5, 1.6)     # Front-diagonal elevated view of the actual table location
+        self.viewer.lookat = (2.7, -1.8, 0.9)  # Looking at table workspace center (near robot base)
 
         # Optimized camera positions for sandwich assembly task
         # Wrist camera: Better view of ingredients and manipulation
