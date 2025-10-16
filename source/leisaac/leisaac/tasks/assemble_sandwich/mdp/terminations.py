@@ -20,6 +20,7 @@ def task_done(
     bread_slice_2_cfg: SceneEntityCfg,
     height_threshold: float = 0.02,
     xy_threshold: float = 0.05,
+    test_mode: bool = False,
 ) -> torch.Tensor:
     """Determine if the sandwich assembly task is complete.
 
@@ -37,10 +38,17 @@ def task_done(
         bread_slice_2_cfg: Configuration for the top bread slice entity.
         height_threshold: Maximum allowed deviation from expected height for each ingredient (in meters).
         xy_threshold: Maximum allowed XY distance from plate center for each ingredient (in meters).
+        test_mode: If True, always return True (for testing/manual annotation with incomplete demos).
+                   If False, enforce strict success criteria. Default: False.
 
     Returns:
         Boolean tensor indicating whether the task is done for each environment.
     """
+    # For testing the pipeline with incomplete demonstrations, always return True
+    if test_mode:
+        num_envs = env.num_envs
+        return torch.ones(num_envs, dtype=torch.bool, device=env.device)
+
     # Get the rigid objects from the scene
     plate = env.scene[plate_cfg.name]
     bread_slice_1 = env.scene[bread_slice_1_cfg.name]

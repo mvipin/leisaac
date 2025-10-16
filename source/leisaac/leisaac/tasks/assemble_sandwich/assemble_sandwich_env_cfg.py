@@ -31,6 +31,7 @@ class TerminationsCfg(SingleArmTerminationsCfg):
             "bread_slice_2_cfg": SceneEntityCfg("bread_slice_2"),
             "height_threshold": 0.02,
             "xy_threshold": 0.05,
+            "test_mode": False,  # Default: enforce strict success criteria
         },
     )
 

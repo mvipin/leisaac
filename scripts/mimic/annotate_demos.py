@@ -29,6 +29,12 @@ parser.add_argument(
 parser.add_argument("--task_type", type=str, default=None, help="Specify task type. If your dataset is recorded with keyboard, you should set it to 'keyboard', otherwise not to set it and keep default value None.")
 parser.add_argument("--auto", action="store_true", default=False, help="Automatically annotate subtasks.")
 parser.add_argument(
+    "--force_completion",
+    action="store_true",
+    default=False,
+    help="Force task completion for incomplete demonstrations. When enabled, the success termination will always return True, allowing incomplete demonstrations to be accepted during manual annotation. Useful for testing the pipeline.",
+)
+parser.add_argument(
     "--enable_pinocchio",
     action="store_true",
     default=False,
@@ -189,6 +195,21 @@ def main():
     success_term = None
     if hasattr(env_cfg.terminations, "success"):
         success_term = env_cfg.terminations.success
+
+        # Modify test_mode parameter based on --force_completion flag
+        if args_cli.force_completion:
+            # Enable test mode to accept incomplete demonstrations
+            if success_term.params is None:
+                success_term.params = {}
+            success_term.params["test_mode"] = True
+            print("[INFO] Force completion enabled: success termination will accept incomplete demonstrations.")
+        else:
+            # Disable test mode to enforce strict success criteria
+            if success_term.params is None:
+                success_term.params = {}
+            success_term.params["test_mode"] = False
+            print("[INFO] Force completion disabled: success termination will enforce strict criteria.")
+
         env_cfg.terminations.success = None
     else:
         raise NotImplementedError("No success termination term was found in the environment.")
