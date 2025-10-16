@@ -46,22 +46,25 @@ def ingredient_grasped(
 
     for ingredient_name in ingredient_names:
         # Check if this ingredient exists in the scene
-        if ingredient_name in env.scene:
+        try:
             ingredient: RigidObject = env.scene[ingredient_name]
+        except KeyError:
+            # Ingredient not in scene, skip it
+            continue
 
-            # Get ingredient position
-            ingredient_pos = ingredient.data.root_pos_w
+        # Get ingredient position
+        ingredient_pos = ingredient.data.root_pos_w
 
-            # Calculate distance between ingredient and end-effector
-            pos_diff = torch.linalg.vector_norm(ingredient_pos - end_effector_pos, dim=1)
+        # Calculate distance between ingredient and end-effector
+        pos_diff = torch.linalg.vector_norm(ingredient_pos - end_effector_pos, dim=1)
 
-            # Check if ingredient is within distance threshold
-            within_distance = pos_diff < diff_threshold
+        # Check if ingredient is within distance threshold
+        within_distance = pos_diff < diff_threshold
 
-            # Ingredient is grasped if both conditions are met
-            ingredient_grasped = torch.logical_and(within_distance, gripper_closed)
+        # Ingredient is grasped if both conditions are met
+        is_grasped = torch.logical_and(within_distance, gripper_closed)
 
-            # Update overall grasped status
-            any_ingredient_grasped = torch.logical_or(any_ingredient_grasped, ingredient_grasped)
+        # Update overall grasped status
+        any_ingredient_grasped = torch.logical_or(any_ingredient_grasped, is_grasped)
 
     return any_ingredient_grasped.clone().detach()

@@ -2,6 +2,8 @@ import enum
 import copy
 import h5py
 import os
+import torch
+import numpy as np
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -60,6 +62,25 @@ class StreamingHDF5DatasetFileHandler(HDF5DatasetFileHandler):
             return funture.result() if write_mode == StreamWriteMode.LAST else funture
 
         def _do_write_episode(self, h5_episode_group: h5py.Group, episode: EpisodeData):
+            def tensor_to_numpy(obj):
+                """Recursively convert tensors to numpy arrays."""
+                if isinstance(obj, torch.Tensor):
+                    return obj.cpu().numpy()
+                elif isinstance(obj, (list, tuple)):
+                    return type(obj)(tensor_to_numpy(item) for item in obj)
+                elif isinstance(obj, dict):
+                    return {k: tensor_to_numpy(v) for k, v in obj.items()}
+                elif isinstance(obj, np.ndarray):
+                    return obj
+                else:
+                    # Check if it's a tensor-like object with cpu() method
+                    if hasattr(obj, 'cpu') and callable(getattr(obj, 'cpu')):
+                        try:
+                            return obj.cpu().numpy()
+                        except:
+                            pass
+                    return obj
+
             def create_dataset_helper(group, key, value):
                 """Helper method to create dataset that contains recursive dict objects."""
                 if isinstance(value, dict):
@@ -70,7 +91,15 @@ class StreamingHDF5DatasetFileHandler(HDF5DatasetFileHandler):
                     for sub_key, sub_value in value.items():
                         create_dataset_helper(key_group, sub_key, sub_value)
                 else:
-                    data = value.cpu().numpy()
+                    # Convert any tensors to numpy arrays first
+                    converted_value = tensor_to_numpy(value)
+
+                    # Now convert to numpy array
+                    if isinstance(converted_value, np.ndarray):
+                        data = converted_value
+                    else:
+                        data = np.array(converted_value)
+
                     if key not in group:
                         dataset = group.create_dataset(
                             key,

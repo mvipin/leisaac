@@ -107,6 +107,27 @@ This section provides a comprehensive end-to-end pipeline for collecting, proces
 
 The MimicGen workflow transforms a small number of human demonstrations into a large dataset of synthetic demonstrations through data augmentation. This process involves several key steps: teleoperation collection, verification, action space conversion, subtask annotation, synthetic generation, and optional format conversion for VLA training.
 
+### Task Selection Guide
+
+**Important**: The sandwich assembly task has two separate task registrations for different purposes:
+
+1. **`LeIsaac-SO101-AssembleSandwich-v0`** (Regular Task)
+   - **Use for**: Teleoperation, data collection, replay
+   - **Action space**: Joint position control (6D: 5 arm joints + 1 gripper)
+   - **Environment**: Standard `ManagerBasedRLEnv`
+
+2. **`LeIsaac-SO101-SandwichIngredient-Mimic-v0`** (Mimic Task)
+   - **Use for**: MimicGen data generation only (Steps 4-5)
+   - **Action space**: IK pose control (8D: 7 pose + 1 gripper)
+   - **Environment**: `ManagerBasedRLLeIsaacMimicEnv` with MimicGen support
+
+**Workflow Summary**:
+- Steps 1-3 (Collection, Replay, IK Conversion): Use **regular task** (`-v0`)
+- Steps 4-5 (Annotation, Generation): Use **Mimic task** (`-Mimic-v0`)
+- Step 6 (Joint Conversion): Use **Mimic task** (`-Mimic-v0`)
+
+This pattern follows the standard approach used by other tasks in the LeIsaac framework (e.g., `pick_orange`, `lift_cube`).
+
 ### Prerequisites
 
 - SO101Leader teleoperation device properly configured
@@ -117,10 +138,12 @@ The MimicGen workflow transforms a small number of human demonstrations into a l
 
 Use the SO101Leader device to collect high-quality human demonstrations for ingredient manipulation.
 
+**Important**: Use the regular task (`LeIsaac-SO101-AssembleSandwich-v0`) for teleoperation, not the Mimic task. The Mimic task is specifically designed for MimicGen data generation.
+
 ```bash
 # Collect bread slice demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/environments/teleoperation/teleop_se3_agent.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-v0 \
     --teleop_device=so101leader \
     --port=/dev/leader \
     --num_envs=1 \
@@ -131,7 +154,7 @@ Use the SO101Leader device to collect high-quality human demonstrations for ingr
 
 # Collect patty demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/environments/teleoperation/teleop_se3_agent.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-v0 \
     --teleop_device=so101leader \
     --port=/dev/leader \
     --num_envs=1 \
@@ -142,7 +165,7 @@ Use the SO101Leader device to collect high-quality human demonstrations for ingr
 
 # Collect cheese slice demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/environments/teleoperation/teleop_se3_agent.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-v0 \
     --teleop_device=so101leader \
     --port=/dev/leader \
     --num_envs=1 \
@@ -172,10 +195,12 @@ Use the SO101Leader device to collect high-quality human demonstrations for ingr
 
 Verify that collected demonstrations can be replayed correctly before proceeding with processing.
 
+**Note**: Use the same task that was used for recording (`LeIsaac-SO101-AssembleSandwich-v0`).
+
 ```bash
 # Replay bread demonstrations
 ~/IsaacLab/_isaac_sim/python.sh scripts/environments/teleoperation/replay.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-v0 \
     --num_envs=1 \
     --device=cuda \
     --enable_cameras \
@@ -184,7 +209,7 @@ Verify that collected demonstrations can be replayed correctly before proceeding
 
 # Replay patty demonstrations
 ~/IsaacLab/_isaac_sim/python.sh scripts/environments/teleoperation/replay.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-v0 \
     --num_envs=1 \
     --device=cuda \
     --enable_cameras \
@@ -193,7 +218,7 @@ Verify that collected demonstrations can be replayed correctly before proceeding
 
 # Replay cheese demonstrations
 ~/IsaacLab/_isaac_sim/python.sh scripts/environments/teleoperation/replay.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-v0 \
     --num_envs=1 \
     --device=cuda \
     --enable_cameras \

@@ -31,8 +31,8 @@ class AssembleSandwichEnvCfg(SingleArmTaskEnvCfg):
         self.viewer.eye = (1.5, -1.5, 1.8)     # Elevated diagonal view
         self.viewer.lookat = (0.0, 0.0, 0.9)   # Looking at table center
 
-        # Robot position for simplified table workspace (1.2m × 0.8m × 0.85m)
-        self.scene.robot.init_state.pos = (0.0, -1.0, 0.0)  # In front of table
+        # Robot position for simplified table workspace
+        self.scene.robot.init_state.pos = (2.7, -2, 0.81)  # Closer to desk/table
 
         # Optimized camera positions for sandwich assembly task
         # Wrist camera: Better view of ingredients and manipulation
