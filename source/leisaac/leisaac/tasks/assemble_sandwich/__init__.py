@@ -20,13 +20,13 @@ gym.register(
     },
 )
 
-# Register generalized sandwich ingredient environment with MimicGen support
+# Register assemble sandwich environment with MimicGen support
 # This environment uses language prompts to differentiate between ingredient types (bread, patty, cheese)
 gym.register(
-    id='LeIsaac-SO101-SandwichIngredient-Mimic-v0',
+    id='LeIsaac-SO101-AssembleSandwich-Mimic-v0',
     entry_point=f"leisaac.enhance.envs:ManagerBasedRLLeIsaacMimicEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.sandwich_ingredient_mimic_env_cfg:SandwichIngredientMimicEnvCfg",
+        "env_cfg_entry_point": f"{__name__}.assemble_sandwich_mimic_env_cfg:AssembleSandwichMimicEnvCfg",
     },
 )

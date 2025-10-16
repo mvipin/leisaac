@@ -10,8 +10,8 @@ from . import mdp
 
 
 @configclass
-class SandwichIngredientObservationsCfg(SingleArmObservationsCfg):
-    """Observation specifications for the sandwich ingredient manipulation task."""
+class AssembleSandwichMimicObservationsCfg(SingleArmObservationsCfg):
+    """Observation specifications for the assemble sandwich mimic task."""
 
     @configclass
     class SubtaskCfg(ObsGroup):
@@ -36,16 +36,16 @@ class SandwichIngredientObservationsCfg(SingleArmObservationsCfg):
 
 
 @configclass
-class SandwichIngredientMimicEnvCfg(AssembleSandwichEnvCfg, MimicEnvCfg):
+class AssembleSandwichMimicEnvCfg(AssembleSandwichEnvCfg, MimicEnvCfg):
     """
-    Generalized configuration for sandwich ingredient manipulation with mimic environment.
+    Configuration for assemble sandwich task with mimic environment support.
     This environment supports language prompt-based differentiation between ingredient types
     (bread, patty, cheese) using the same physical manipulation skills. The specific ingredient
     type is determined by language prompts during training and inference.
     """
 
     # Override observations to include subtask terms for automatic annotation
-    observations: SandwichIngredientObservationsCfg = SandwichIngredientObservationsCfg()
+    observations: AssembleSandwichMimicObservationsCfg = AssembleSandwichMimicObservationsCfg()
 
     def __post_init__(self):
         super().__post_init__()

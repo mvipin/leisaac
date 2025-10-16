@@ -9,7 +9,7 @@ The sandwich assembly task provides a generalized environment for ingredient man
 ## Available Environments
 
 ### 1. Generalized Ingredient Manipulation (⭐ Recommended for VLA Training)
-- **Environment ID**: `LeIsaac-SO101-SandwichIngredient-Mimic-v0`
+- **Environment ID**: `LeIsaac-SO101-AssembleSandwich-Mimic-v0`
 - **Description**: Language prompt-based ingredient manipulation
 - **Use Case**: VLA training with GR00T N1.5
 - **Key Features**: Single environment for all ingredient types with language prompt differentiation
@@ -27,7 +27,7 @@ The sandwich assembly task provides a generalized environment for ingredient man
 ## Key Features
 
 ### Language Prompt Support
-The generalized environment (`SandwichIngredient-Mimic-v0`) supports language prompt differentiation:
+The generalized environment (`AssembleSandwich-Mimic-v0`) supports language prompt differentiation:
 - **Bread**: "Grasp bread slice and place on plate"
 - **Patty**: "Grasp patty and place on plate"
 - **Cheese**: "Grasp cheese slice and place on plate"
@@ -50,7 +50,7 @@ The generalized environment (`SandwichIngredient-Mimic-v0`) supports language pr
 import gymnasium as gym
 
 # Recommended: Generalized ingredient environment for VLA training
-env = gym.make("LeIsaac-SO101-SandwichIngredient-Mimic-v0")
+env = gym.make("LeIsaac-SO101-AssembleSandwich-Mimic-v0")
 
 # Basic assembly environment (non-MimicGen)
 env = gym.make("LeIsaac-SO101-AssembleSandwich-v0")
@@ -60,7 +60,7 @@ env = gym.make("LeIsaac-SO101-AssembleSandwich-v0")
 ```bash
 # Generate data for generalized ingredient manipulation
 python scripts/mimic/collect_demonstrations.py \
-    --task LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --num_demos 50 \
     --output_file ./datasets/sandwich_ingredient_demos.hdf5
 
@@ -116,7 +116,7 @@ The MimicGen workflow transforms a small number of human demonstrations into a l
    - **Action space**: Joint position control (6D: 5 arm joints + 1 gripper)
    - **Environment**: Standard `ManagerBasedRLEnv`
 
-2. **`LeIsaac-SO101-SandwichIngredient-Mimic-v0`** (Mimic Task)
+2. **`LeIsaac-SO101-AssembleSandwich-Mimic-v0`** (Mimic Task)
    - **Use for**: MimicGen data generation only (Steps 4-5)
    - **Action space**: IK pose control (8D: 7 pose + 1 gripper)
    - **Environment**: `ManagerBasedRLLeIsaacMimicEnv` with MimicGen support
@@ -280,7 +280,7 @@ Add MimicGen subtask termination signals to enable proper segmentation during da
 ```bash
 # Annotate bread demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/annotate_demos.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/processed_bread_ingredient.hdf5 \
     --output_file=./datasets/annotated_bread_ingredient.hdf5 \
     --device=cuda \
@@ -289,7 +289,7 @@ Add MimicGen subtask termination signals to enable proper segmentation during da
 
 # Annotate patty demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/annotate_demos.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/processed_patty_ingredient.hdf5 \
     --output_file=./datasets/annotated_patty_ingredient.hdf5 \
     --device=cuda \
@@ -298,7 +298,7 @@ Add MimicGen subtask termination signals to enable proper segmentation during da
 
 # Annotate cheese demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/annotate_demos.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/processed_cheese_ingredient.hdf5 \
     --output_file=./datasets/annotated_cheese_ingredient.hdf5 \
     --device=cuda \
@@ -328,7 +328,7 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
 ```bash
 # Generate augmented bread demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/generate_dataset.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/annotated_bread_ingredient.hdf5 \
     --output_file=./datasets/generated_bread_ingredient.hdf5 \
     --generation_num_trials=20 \
@@ -338,7 +338,7 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
 
 # Generate augmented patty demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/generate_dataset.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/annotated_patty_ingredient.hdf5 \
     --output_file=./datasets/generated_patty_ingredient.hdf5 \
     --generation_num_trials=20 \
@@ -348,7 +348,7 @@ Use MimicGen to create synthetic demonstrations from the annotated human demonst
 
 # Generate augmented cheese demonstrations
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/generate_dataset.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/annotated_cheese_ingredient.hdf5 \
     --output_file=./datasets/generated_cheese_ingredient.hdf5 \
     --generation_num_trials=20 \
@@ -541,7 +541,7 @@ sudo chmod 666 /dev/ttyUSB*
 # Switch to manual annotation
 # Remove --auto flag and use interactive interface
 /home/vipin/IsaacSim/_build/linux-x86_64/release/python.sh scripts/mimic/annotate_demos.py \
-    --task=LeIsaac-SO101-SandwichIngredient-Mimic-v0 \
+    --task=LeIsaac-SO101-AssembleSandwich-Mimic-v0 \
     --input_file=./datasets/processed_ingredient.hdf5 \
     --output_file=./datasets/annotated_ingredient.hdf5 \
     --device=cuda \
@@ -615,7 +615,7 @@ If you encounter issues not covered here:
 ## Best Practices
 
 ### For VLA Training
-1. Use `LeIsaac-SO101-SandwichIngredient-Mimic-v0` for language prompt training
+1. Use `LeIsaac-SO101-AssembleSandwich-Mimic-v0` for language prompt training
 2. Collect separate datasets for each ingredient type
 3. Use descriptive filenames: `bread_demos.hdf5`, `patty_demos.hdf5`, `cheese_demos.hdf5`
 4. Apply language prompts during HDF5 → LeRobot conversion
@@ -627,7 +627,7 @@ If you encounter issues not covered here:
 
 ## Summary
 
-The sandwich assembly task provides a comprehensive framework for ingredient manipulation with language prompt support. The generalized `SandwichIngredient-Mimic-v0` environment is specifically designed for VLA training, allowing a single environment to handle multiple ingredient types through natural language descriptions.
+The sandwich assembly task provides a comprehensive framework for ingredient manipulation with language prompt support. The generalized `AssembleSandwich-Mimic-v0` environment is specifically designed for VLA training, allowing a single environment to handle multiple ingredient types through natural language descriptions.
 
 **Key Benefits:**
 - **Single Environment**: One environment for all ingredient types
